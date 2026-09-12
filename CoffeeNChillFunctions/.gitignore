@@ -1,0 +1,24 @@
+# Build output
+bin/
+obj/
+
+# Local Azure Functions settings (contains connection strings - never commit this)
+local.settings.json
+
+# Azurite local emulator data
+__azurite_db*__.json
+__blobstorage__/
+__queuestorage__/
+__tablestorage__/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Do NOT ignore the example settings file - Thato needs this to set up her own local.settings.json
+!local.settings.json.example
