@@ -8,21 +8,25 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <!-- Needed for the ASP.NET Core-integrated HTTP model (HttpRequestData/HttpResponseData) on .NET 9 -->
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
+	<ItemGroup>
+		<!-- Table Storage (Menu functions) -->
+		<PackageReference Include="Azure.Data.Tables" Version="12.9.1" />
 
-  <ItemGroup>
-    <PackageReference Include="Azure.Data.Tables" Version="12.9.1" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.23.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.2.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.17.4" OutputItemType="Analyzer" />
-  </ItemGroup>
+		<!-- Isolated worker + classic HttpRequestData/HttpResponseData HTTP model -->
+		<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.52.0" />
+		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.2.0" />
+		<PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.1.0" OutputItemType="Analyzer" />
 
-  <ItemGroup>
-    <None Include="host.json" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="local.settings.json.example" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
+		<!-- Blob Storage (staff-document functions) -->
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.22.2" />
+
+		<!-- Streaming multipart/form-data parsing for the upload endpoint -->
+		<PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.10" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="host.json" CopyToOutputDirectory="PreserveNewest" />
+		<None Include="local.settings.json.example" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
 
 </Project>
