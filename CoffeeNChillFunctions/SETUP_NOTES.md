@@ -63,7 +63,7 @@ and point the connection string at Azurite by container name instead:
 docker network create coffeenchill-net
 docker run -d --name azurite --network coffeenchill-net -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
 docker run -d --name functions --network coffeenchill-net -p 7071:80 ^
-  -e AzureWebJobsStorage="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUUwYBI0U55oV9VXfEqoBWhVOKB4EDsD0EiIVjhZmXCbXW5oz2f8g4iCsHfNy9UhQV9zvA==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;" ^
+  -e AzureWebJobsStorage="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;" ^
   <dockerhub_username>/coffeenchill-functions:v1.0
 ```
 If your marker is only checking that each container builds and runs in isolation
