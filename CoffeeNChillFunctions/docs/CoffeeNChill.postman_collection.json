@@ -1,0 +1,168 @@
+{
+  "info": {
+    "name": "CoffeeNChill - Part 1",
+    "description": "Menu (Table Storage, Reesaido) + Staff Documents (Blob Storage, Thato) endpoints, running against Azurite.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:7071" },
+    { "key": "fileName", "value": "health-and-safety-policy.pdf" },
+    { "key": "category", "value": "Hot Drinks" },
+    { "key": "itemId", "value": "COF-001" }
+  ],
+  "item": [
+    {
+      "name": "Menu",
+      "item": [
+        {
+          "name": "Create Menu Item",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu",
+              "host": ["{{baseUrl}}"], "path": ["api", "menu"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"{{category}}\",\n  \"id\": \"{{itemId}}\",\n  \"name\": \"Espresso\",\n  \"description\": \"Double shot, house blend\",\n  \"price\": 28.5,\n  \"isAvailable\": true\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('Status code is 201 Created', function () { pm.response.to.have.status(201); });"
+            ]}
+          }]
+        },
+        {
+          "name": "Get All Menu Items",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/menu", "host": ["{{baseUrl}}"], "path": ["api", "menu"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response is an array', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+            ]}
+          }]
+        },
+        {
+          "name": "Get Menu Items By Category",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/category/{{category}}",
+              "host": ["{{baseUrl}}"], "path": ["api", "menu", "category", "{{category}}"]
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });"
+            ]}
+          }]
+        },
+        {
+          "name": "Update Menu Item",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/{{category}}/{{itemId}}",
+              "host": ["{{baseUrl}}"], "path": ["api", "menu", "{{category}}", "{{itemId}}"]
+            },
+            "body": { "mode": "raw", "raw": "{\n  \"price\": 30.0,\n  \"isAvailable\": false\n}" }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });"
+            ]}
+          }]
+        },
+        {
+          "name": "Delete Menu Item",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/{{category}}/{{itemId}}",
+              "host": ["{{baseUrl}}"], "path": ["api", "menu", "{{category}}", "{{itemId}}"]
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('Status code is 204 No Content', function () { pm.response.to.have.status(204); });"
+            ]}
+          }]
+        }
+      ]
+    },
+    {
+      "name": "Staff Documents",
+      "item": [
+        {
+          "name": "Upload Staff Document",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/documents/upload",
+              "host": ["{{baseUrl}}"], "path": ["api", "documents", "upload"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "", "description": "Attach a sample PDF" }
+              ]
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('Status code is 201 Created', function () { pm.response.to.have.status(201); });",
+              "pm.test('Response contains uploaded fileName', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.have.property('fileName');",
+              "    pm.collectionVariables.set('fileName', body.fileName);",
+              "});"
+            ]}
+          }]
+        },
+        {
+          "name": "List Staff Documents",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/documents", "host": ["{{baseUrl}}"], "path": ["api", "documents"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response is an array', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+            ]}
+          }]
+        },
+        {
+          "name": "Download Staff Document",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/documents/download/{{fileName}}",
+              "host": ["{{baseUrl}}"], "path": ["api", "documents", "download", "{{fileName}}"]
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Content-Disposition header is present', function () { pm.response.to.have.header('Content-Disposition'); });"
+            ]}
+          }]
+        }
+      ]
+    }
+  ]
+}
