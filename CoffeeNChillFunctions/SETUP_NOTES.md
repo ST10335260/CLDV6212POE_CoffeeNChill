@@ -1,41 +1,79 @@
-# Reesaido's Menu Functions — Setup Notes
+# CoffeeNChill Functions — Setup Notes (merged project)
 
-## What's in this folder
-- `MenuItemEntity.cs` — the `MenuItems` table entity + request DTOs
-- `MenuFunctions.cs` — the 5 HTTP functions: CreateMenuItem, GetAllMenuItems,
-  GetMenuItemsByCategory, UpdateMenuItem, DeleteMenuItem
-- `Program.cs`, `host.json`, `CoffeeNChillFunctions.csproj` — standard isolated-worker
-  Azure Functions (.NET 8) project scaffolding
-- `local.settings.json.example` — copy this to `local.settings.json` (don't commit the real one)
+## Addendum applied (per updated POE doc)
+The module updated the brief after the original version was issued:
+- **Staff documents now use Azure Blob Storage**, not Azure File Storage — because
+  Azure File Storage isn't emulated by Azurite. Thato already implemented this
+  correctly using `Azure.Storage.Blobs` (container name: `staff-docs`).
+- The standalone Docker run command for the Functions container **no longer needs
+  the `-e AzureWebJobsStorage=...` flag** — the code already falls back to
+  `UseDevelopmentStorage=true` when that environment variable isn't set, so it's
+  redundant to pass it explicitly.
 
-## Before you run it (Visual Studio, .NET 9)
-1. Make sure you have **Visual Studio 2022 version 17.12 or later** — older versions don't
-   know how to run/debug a .NET 9 Functions app. Check Help → About Microsoft Visual Studio.
-2. Make sure the **Azure development** workload is installed (Tools → Get Tools and Features).
-3. Open `CoffeeNChillFunctions.csproj` directly, or add the folder to your existing solution
-   (right-click solution → Add → Existing Project).
-4. Copy `local.settings.json.example` → `local.settings.json` (same folder). Visual Studio
-   won't create this for you automatically if you're adding an existing project.
-5. Make sure Azurite is running (Thato's container, or the Azurite VS extension/npm package)
-   on the default ports (10000/10001/10002) — `UseDevelopmentStorage=true` points at it.
-6. Hit **F5** (or the green "Start" button) — Visual Studio will restore NuGet packages and
-   launch the Functions host automatically. Watch the console window that pops up for the
-   list of function URLs it's listening on.
-7. The code calls `CreateIfNotExistsAsync()` on the `MenuItems` table automatically the first
-   time any function runs — so nobody has to create the table by hand.
+## What's in this folder (now merged)
+- `MenuItemEntity.cs`, `MenuFunctions.cs` — Reesaido's part: the `MenuItems` table +
+  5 CRUD functions (Create, GetAll, GetByCategory, Update, Delete)
+- `UploadStaffDocument.cs`, `ListStaffDocuments.cs`, `DownloadStaffDocument.cs` —
+  Thato's part: the `staff-docs` Blob container + 3 functions (Upload, List, Download)
+- `Program.cs` — single shared entry point; registers `BlobServiceClient` for DI
+  (used by the document functions). The menu functions build their own `TableClient`
+  internally, so no extra DI registration was needed for those.
+- `CoffeeNChillFunctions.csproj` — one project, references both `Azure.Data.Tables`
+  and `Azure.Storage.Blobs`, plus `Microsoft.AspNetCore.WebUtilities` for parsing the
+  multipart upload.
+- `Dockerfile` — multi-stage build, isolated-worker .NET 9 base image.
 
-If F5 complains about missing Functions tooling, go to Tools → Options → Azure Functions and
-make sure the "Azure Functions Core Tools" version shown is up to date — VS will offer to
-download the matching version for .NET 9 the first time you run.
+## Do you need to manually create anything in Azure?
+**No.** Nothing in this part touches a real Azure subscription. Both storage types are
+created automatically the first time they're used:
+- `MenuItems` table -> created by `CreateIfNotExistsAsync()` in `MenuFunctions.cs`
+- `staff-docs` container -> created by `CreateIfNotExistsAsync()` in
+  `UploadStaffDocument.cs` / `ListStaffDocuments.cs`
 
-## Message to send Thato
-> "Hey Thato — my functions will auto-create the `MenuItems` table the first time they run
-> against Azurite (via `CreateIfNotExistsAsync`), so you don't need to pre-create it manually.
-> All I need from your side is Azurite up and running on the default ports before I test.
-> Once you've got the Azurite container going, can you confirm the table shows up in Azure
-> Storage Explorer (or via `az storage table list --connection-string ...`) after I run a
-> CreateMenuItem request? That way we've both verified it end-to-end before we merge our
-> Postman collections."
+All you need running is **Azurite** (locally or in its own Docker container) — no
+Azure Storage Account, no Azure Portal, no `az` CLI login.
+
+## Running it locally (Visual Studio, .NET 9)
+1. Visual Studio 2022 17.12+, with the **Azure development** workload installed.
+2. Copy `local.settings.json.example` → `local.settings.json`.
+3. Start Azurite first (your existing shortcut is fine — leave that window open).
+4. Hit F5. Watch the console window for the list of function URLs.
+5. Test all 8 endpoints (5 menu + 3 documents) in Postman before recording anything.
+
+## Running the two standalone Docker containers (per the addendum)
+```
+# Azurite, in its own container
+docker run -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
+
+# Build & push your Functions image
+docker build -t <dockerhub_username>/coffeenchill-functions:v1.0 .
+docker push <dockerhub_username>/coffeenchill-functions:v1.0
+
+# Run the Functions container (no connection string needed, per the addendum)
+docker run -p 7071:80 <dockerhub_username>/coffeenchill-functions:v1.0
+```
+
+**Heads-up (not covered by the addendum, but worth knowing):** two independent
+`docker run` containers can't see each other over `localhost` — `UseDevelopmentStorage=true`
+resolves to `127.0.0.1` inside the Functions container, which is the container itself,
+not your Azurite container. If your video needs Postman hitting the *containerized*
+function and it can't reach storage, put both containers on the same custom network
+and point the connection string at Azurite by container name instead:
+```
+docker network create coffeenchill-net
+docker run -d --name azurite --network coffeenchill-net -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
+docker run -d --name functions --network coffeenchill-net -p 7071:80 ^
+  -e AzureWebJobsStorage="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUUwYBI0U55oV9VXfEqoBWhVOKB4EDsD0EiIVjhZmXCbXW5oz2f8g4iCsHfNy9UhQV9zvA==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;" ^
+  <dockerhub_username>/coffeenchill-functions:v1.0
+```
+If your marker is only checking that each container builds and runs in isolation
+(rather than talking to each other), you can skip this and just follow the simpler
+commands above exactly as the addendum shows them.
 
 ## Before you submit
-- Test all 5 endpoints yourself against Azurite before merging your Postman requests with Thato's.
+- Both of you: check the AI-disclosure comment in the file(s) you personally worked
+  on and update it with what you actually tested/changed.
+- Merge your Postman requests into one collection (8 total requests), export as
+  `.json`, commit to `/docs`.
+- Record the video showing both containers running and the full Postman collection
+  passing.
