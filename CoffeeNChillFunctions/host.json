@@ -7,5 +7,12 @@
         "excludedTypes": "Request"
       }
     }
+  },
+  "extensions": {
+    "queues": {
+      "maxPollingInterval": "00:00:02",
+      "maxDequeueCount": 3,
+      "messageEncoding": "base64"
+    }
   }
 }

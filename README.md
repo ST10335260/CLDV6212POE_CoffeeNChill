@@ -1,6 +1,10 @@
 # CLDV6212POE_CoffeeNChill — Part 1 (CLDV6212/W, Cloud Development B)
 
+<<<<<<< Updated upstream
 Azure Functions, Table Storage, Blob Storage and standalone Docker containers
+=======
+Azure Functions, Table Storage, Blob Storage, and standalone Docker containers
+>>>>>>> Stashed changes
 for the CoffeeNChill digital menu and staff-document system.
 
 > **Addendum applied:** staff documents are stored in **Azure Blob Storage**
@@ -140,4 +144,14 @@ separate merge step needed now that both members' requests are in it.
 
 Parts of the staff-document functions, the `Program.cs`/`.csproj` fixes,
 Dockerfile, and Postman collection were scaffolded with AI assistance
+<<<<<<< Updated upstream
 (Claude) and adjustments to comments and reviewed/tested against Azurite by Thato Gumede.
+=======
+(Claude) and reviewed/tested against Azurite by Thato Gumede.
+
+
+## 7. Video
+
+`<YouTube link here>` — demonstrates `docker run` for both containers and a
+full pass through the Postman collection.
+>>>>>>> Stashed changes
