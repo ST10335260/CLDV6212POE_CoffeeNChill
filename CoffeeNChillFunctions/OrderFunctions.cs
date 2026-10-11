@@ -27,7 +27,7 @@ namespace CoffeeNChillFunctions
             }
 
             var response = req.CreateResponse(HttpStatusCode.OK);
-            await response.WriteAsJsonAsync(orders, HttpStatusCode.OK);
+            await response.WriteAsJsonAsync(orders);
             return response;
         }
 
@@ -42,15 +42,14 @@ namespace CoffeeNChillFunctions
             {
                 var result = await tableClient.GetEntityAsync<OrderEntity>(orderDate, orderId);
                 var response = req.CreateResponse(HttpStatusCode.OK);
-                await response.WriteAsJsonAsync(ToResponse(result.Value), HttpStatusCode.OK);
+                await response.WriteAsJsonAsync(ToResponse(result.Value));
                 return response;
             }
             catch (RequestFailedException ex) when (ex.Status == 404)
             {
                 var notFound = req.CreateResponse(HttpStatusCode.NotFound);
                 await notFound.WriteAsJsonAsync(
-                    new { error = $"Order '{orderId}' was not found for {orderDate}." },
-                    HttpStatusCode.NotFound);
+                    new { error = $"Order '{orderId}' was not found for {orderDate}." });
                 return notFound;
             }
         }

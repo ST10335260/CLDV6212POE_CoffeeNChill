@@ -120,7 +120,7 @@ namespace CoffeeNChillFunctions
         private static async Task<HttpResponseData> WriteJson(HttpRequestData req, HttpStatusCode status, object payload)
         {
             var response = req.CreateResponse(status);
-            await response.WriteAsJsonAsync(payload, status);
+            await response.WriteAsJsonAsync(payload);
             return response;
         }
     }
