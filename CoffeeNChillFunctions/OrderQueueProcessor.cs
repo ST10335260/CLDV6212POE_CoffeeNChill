@@ -16,6 +16,7 @@ namespace CoffeeNChillFunctions
             _logger = logger;
         }
 
+        // Queue trigger; messages that keep failing are moved to the poison queue (Microsoft, n.d.a).
         [Function("ProcessOrderQueue")]
         public async Task ProcessOrderQueue(
             [QueueTrigger("order-processing-queue")] string message)
@@ -51,10 +52,13 @@ namespace CoffeeNChillFunctions
                 Status = OrderStatus.Received
             };
 
+            // Upsert writes the order to the Orders table (Microsoft, n.d.d).
             await tableClient.UpsertEntityAsync(entity, TableUpdateMode.Replace);
             _logger.LogInformation("Order {OrderId} saved with status {Status}", entity.RowKey, entity.Status);
 
+            // Timer simulates the order status changes, based on the System.Timers.Timer class (Microsoft, n.d.f).
             var remainingStatuses = new Queue<string>(new[] { OrderStatus.Preparing, OrderStatus.Ready, OrderStatus.Collected });
+            // TaskCompletionSource keeps the function running until the last status is saved (Microsoft, n.d.e).
             var finished = new TaskCompletionSource();
 
             using var statusTimer = new System.Timers.Timer(StepDelay.TotalMilliseconds) { AutoReset = false };
@@ -85,6 +89,7 @@ namespace CoffeeNChillFunctions
             await finished.Task;
         }
 
+        // Reads messages from the poison queue created by the queue trigger (Microsoft, n.d.a).
         [Function("LogPoisonOrder")]
         public void LogPoisonOrder(
             [QueueTrigger("order-processing-queue-poison")] string message)

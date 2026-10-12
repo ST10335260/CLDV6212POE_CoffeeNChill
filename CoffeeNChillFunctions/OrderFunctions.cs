@@ -7,6 +7,7 @@ namespace CoffeeNChillFunctions
 {
     public class OrderFunctions
     {
+        // HTTP triggers written with the isolated worker HttpRequestData and HttpResponseData model (Microsoft, n.d.b).
         [Function("GetAllOrders")]
         public async Task<HttpResponseData> GetAllOrders(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "orders")] HttpRequestData req)
@@ -15,6 +16,7 @@ namespace CoffeeNChillFunctions
             var tableClient = await OrdersTable.GetClientAsync();
 
             var orders = new List<object>();
+            // QueryAsync reads the orders from the table (Microsoft, n.d.d).
             await foreach (var entity in tableClient.QueryAsync<OrderEntity>())
             {
                 if (!string.IsNullOrWhiteSpace(statusFilter)
@@ -40,6 +42,7 @@ namespace CoffeeNChillFunctions
 
             try
             {
+                // GetEntityAsync reads one order by its partition key and row key (Microsoft, n.d.d).
                 var result = await tableClient.GetEntityAsync<OrderEntity>(orderDate, orderId);
                 var response = req.CreateResponse(HttpStatusCode.OK);
                 await response.WriteAsJsonAsync(ToResponse(result.Value));

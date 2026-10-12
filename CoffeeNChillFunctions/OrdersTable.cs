@@ -12,6 +12,7 @@ namespace CoffeeNChillFunctions
                 ?? "UseDevelopmentStorage=true";
 
             var tableClient = new TableServiceClient(connectionString).GetTableClient(Name);
+            // Creates the Orders table on first use (Microsoft, n.d.d).
             await tableClient.CreateIfNotExistsAsync();
             return tableClient;
         }

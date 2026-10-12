@@ -19,6 +19,7 @@ namespace CoffeeNChillFunctions
             _logger = logger;
         }
 
+        // HTTP trigger written with the isolated worker HttpRequestData and HttpResponseData model (Microsoft, n.d.b).
         [Function("PlaceOrderOnQueue")]
         public async Task<HttpResponseData> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "orders/queue")] HttpRequestData req)
@@ -78,6 +79,7 @@ namespace CoffeeNChillFunctions
             string connectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage")
                 ?? "UseDevelopmentStorage=true";
 
+            // Base64 encoding so the queue trigger can read the message (Microsoft, n.d.a; Microsoft, n.d.c).
             var options = new QueueClientOptions { MessageEncoding = QueueMessageEncoding.Base64 };
             return new QueueClient(connectionString, QueueName, options);
         }
