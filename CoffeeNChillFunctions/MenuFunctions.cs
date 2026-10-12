@@ -20,7 +20,7 @@ namespace CoffeeNChillFunctions
         }
 
         // Builds a TableClient from the AzureWebJobsStorage connection string
-        // and makes sure the MenuItems table exists before we use it.
+        // and makes sure the MenuItems table exists.
         private static async Task<TableClient> GetTableClientAsync()
         {
             string connectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage")
@@ -37,7 +37,7 @@ namespace CoffeeNChillFunctions
         // ---------------------------------------------------------------
         [Function("CreateMenuItem")]
         public async Task<HttpResponseData> CreateMenuItem(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "menu")] HttpRequestData req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "menu")] HttpRequestData req)
         {
             string body = await new StreamReader(req.Body).ReadToEndAsync();
             MenuItemCreateDto? input;
@@ -89,7 +89,7 @@ namespace CoffeeNChillFunctions
         // ---------------------------------------------------------------
         [Function("GetAllMenuItems")]
         public async Task<HttpResponseData> GetAllMenuItems(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "menu")] HttpRequestData req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "menu")] HttpRequestData req)
         {
             var tableClient = await GetTableClientAsync();
 
@@ -109,7 +109,7 @@ namespace CoffeeNChillFunctions
         // ---------------------------------------------------------------
         [Function("GetMenuItemsByCategory")]
         public async Task<HttpResponseData> GetMenuItemsByCategory(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "menu/category/{category}")] HttpRequestData req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "menu/category/{category}")] HttpRequestData req,
             string category)
         {
             var tableClient = await GetTableClientAsync();
@@ -130,7 +130,7 @@ namespace CoffeeNChillFunctions
         // ---------------------------------------------------------------
         [Function("UpdateMenuItem")]
         public async Task<HttpResponseData> UpdateMenuItem(
-            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "menu/{category}/{id}")] HttpRequestData req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "menu/{category}/{id}")] HttpRequestData req,
             string category, string id)
         {
             var tableClient = await GetTableClientAsync();
@@ -180,7 +180,7 @@ namespace CoffeeNChillFunctions
         // ---------------------------------------------------------------
         [Function("DeleteMenuItem")]
         public async Task<HttpResponseData> DeleteMenuItem(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "menu/{category}/{id}")] HttpRequestData req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "menu/{category}/{id}")] HttpRequestData req,
             string category, string id)
         {
             var tableClient = await GetTableClientAsync();
