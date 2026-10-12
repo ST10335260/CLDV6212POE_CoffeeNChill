@@ -1,0 +1,543 @@
+{
+  "info": {
+    "_postman_id": "3c86175c-a17c-4a76-8555-0780ae9ac991",
+    "name": "CoffeeNChill - Part 2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53062674",
+    "_collection_link": "https://go.postman.co/collection/53062674-3c86175c-a17c-4a76-8555-0780ae9ac991?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Menu",
+      "item": [
+        {
+          "name": "Create Menu Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"{{category}}\",\n  \"id\": \"{{itemId}}\",\n  \"name\": \"Espresso\",\n  \"description\": \"Double shot, house blend\",\n  \"price\": 28.5,\n  \"isAvailable\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/menu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Menu Items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response is an array', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Menu Items By Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/category/{{category}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu",
+                "category",
+                "{{category}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Menu Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 30.0,\n  \"isAvailable\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/{{category}}/{{itemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu",
+                "{{category}}",
+                "{{itemId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Menu Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204 No Content', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/{{category}}/{{itemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu",
+                "{{category}}",
+                "{{itemId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Staff Documents",
+      "item": [
+        {
+          "name": "Upload Staff Document",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () { pm.response.to.have.status(201); });\npm.test('Response contains uploaded fileName', function () {\n    const body = pm.response.json();\n    pm.expect(body).to.have.property('fileName');\n    pm.collectionVariables.set('fileName', body.fileName);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Attach a sample PDF",
+                  "src": [
+                    "CLDV212.pdf"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/documents/upload",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "documents",
+                "upload"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Staff Documents",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response is an array', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/documents",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "documents"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download Staff Document",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Disposition header is present', function () { pm.response.to.have.header('Content-Disposition'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/documents/download/{{fileName}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "documents",
+                "download",
+                "{{fileName}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders (Part 2)",
+      "item": [
+        {
+          "name": "1. Place Order (Queue Producer)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const now = new Date();",
+                  "pm.collectionVariables.set('orderId', 'ORD-' + now.getTime());",
+                  "pm.collectionVariables.set('orderTimestamp', now.toISOString());",
+                  "pm.collectionVariables.set('orderDate', now.toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Order accepted and queued (2xx)', function () { pm.expect(pm.response.code).to.be.within(200, 299); });",
+                  "pm.test('Responds quickly (queue placement only, under 2000 ms)', function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"OrderId\": \"{{orderId}}\",\n  \"CustomerName\": \"Thato Gumede\",\n  \"SelectedItemSKUs\": [\"COF-001\", \"MUF-002\"],\n  \"TotalPrice\": 78.5,\n  \"OrderTimestamp\": \"{{orderTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/queue",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "queue"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Place Invalid Order (missing OrderId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Invalid payload rejected with 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"CustomerName\": \"Thato Gumede\",\n  \"TotalPrice\": 78.5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/queue",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "queue"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Get Order Status (early, in lifecycle)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Give the queue-triggered function time to pick up the message.",
+                  "setTimeout(function () {}, 3000);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Order found in Orders table (200)', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Status is a valid lifecycle stage', function () {",
+                  "    const stages = ['Received', 'Preparing', 'Ready', 'Collected'];",
+                  "    pm.expect(stages).to.include(pm.response.json().status);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{{orderDate}}/{{orderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "{{orderDate}}",
+                "{{orderId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. List All Orders",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response is an array containing the placed order', function () {",
+                  "    const orders = pm.response.json();",
+                  "    pm.expect(orders).to.be.an('array');",
+                  "    pm.expect(orders.map(function (o) { return o.orderId; })).to.include(pm.collectionVariables.get('orderId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Get Order Status (after processing = Collected)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// The simulated lifecycle takes about 15 seconds in total.",
+                  "setTimeout(function () {}, 16000);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Order found in Orders table (200)', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Order reached final status Collected', function () { pm.expect(pm.response.json().status).to.eql('Collected'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{{orderDate}}/{{orderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "{{orderDate}}",
+                "{{orderId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:7071"
+    },
+    {
+      "key": "fileName",
+      "value": "health-and-safety-policy.pdf"
+    },
+    {
+      "key": "category",
+      "value": "Hot Drinks"
+    },
+    {
+      "key": "itemId",
+      "value": "COF-001"
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    },
+    {
+      "key": "orderDate",
+      "value": ""
+    },
+    {
+      "key": "orderTimestamp",
+      "value": ""
+    }
+  ]
+}
