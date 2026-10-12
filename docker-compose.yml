@@ -1,4 +1,5 @@
 # CoffeeNChill Part 2 - single-command stack (Azurite + Functions)
+
 services:
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
@@ -13,16 +14,23 @@ services:
       - "10002:10002"   # Table
     volumes:
       - azurite-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 10000 && nc -z 127.0.0.1 10001 && nc -z 127.0.0.1 10002"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
 
   functions:
-    image: thatogumede/coffeenchill-functions:v2.0   
+    image: thatogumede/coffeenchill-functions:v2.0   # published image
     container_name: coffeenchill-functions
     depends_on:
-      - azurite
+      azurite:
+        condition: service_healthy
     restart: on-failure
     ports:
       - "7071:80"
     environment:
+   
       FUNCTIONS_WORKER_RUNTIME: dotnet-isolated
       AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
 
