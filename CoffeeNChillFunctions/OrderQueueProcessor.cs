@@ -54,13 +54,35 @@ namespace CoffeeNChillFunctions
             await tableClient.UpsertEntityAsync(entity, TableUpdateMode.Replace);
             _logger.LogInformation("Order {OrderId} saved with status {Status}", entity.RowKey, entity.Status);
 
-            foreach (var nextStatus in new[] { OrderStatus.Preparing, OrderStatus.Ready, OrderStatus.Collected })
+            var remainingStatuses = new Queue<string>(new[] { OrderStatus.Preparing, OrderStatus.Ready, OrderStatus.Collected });
+            var finished = new TaskCompletionSource();
+
+            using var statusTimer = new System.Timers.Timer(StepDelay.TotalMilliseconds) { AutoReset = false };
+            statusTimer.Elapsed += async (_, _) =>
             {
-                await Task.Delay(StepDelay);
-                entity.Status = nextStatus;
-                await tableClient.UpsertEntityAsync(entity, TableUpdateMode.Replace);
-                _logger.LogInformation("Order {OrderId} moved to status {Status}", entity.RowKey, entity.Status);
-            }
+                try
+                {
+                    entity.Status = remainingStatuses.Dequeue();
+                    await tableClient.UpsertEntityAsync(entity, TableUpdateMode.Replace);
+                    _logger.LogInformation("Order {OrderId} moved to status {Status}", entity.RowKey, entity.Status);
+
+                    if (remainingStatuses.Count == 0)
+                    {
+                        finished.TrySetResult();
+                    }
+                    else
+                    {
+                        statusTimer.Start();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    finished.TrySetException(ex);
+                }
+            };
+
+            statusTimer.Start();
+            await finished.Task;
         }
 
         [Function("LogPoisonOrder")]
