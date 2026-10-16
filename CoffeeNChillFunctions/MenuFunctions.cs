@@ -12,6 +12,7 @@ namespace CoffeeNChillFunctions
     {
         private const string TableName = "MenuItems";
         private readonly ILogger<MenuFunctions> _logger;
+        // JsonSerializerDefaults.Web gives case-insensitive property names and camelCase output (Microsoft, n.d.e).
         private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
         public MenuFunctions(ILogger<MenuFunctions> logger)
@@ -21,6 +22,7 @@ namespace CoffeeNChillFunctions
 
         // Builds a TableClient from the AzureWebJobsStorage connection string
         // and makes sure the MenuItems table exists before we use it.
+        // TableClient.CreateIfNotExistsAsync creates the table on first use (Microsoft, n.d.g).
         private static async Task<TableClient> GetTableClientAsync()
         {
             string connectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage")
@@ -35,6 +37,7 @@ namespace CoffeeNChillFunctions
         // ---------------------------------------------------------------
         // POST /api/menu  -> CreateMenuItem
         // ---------------------------------------------------------------
+        // Isolated worker functions use HttpRequestData and HttpResponseData (Microsoft, n.d.d). HTTP trigger with an authorization level and route (Microsoft, n.d.a).
         [Function("CreateMenuItem")]
         public async Task<HttpResponseData> CreateMenuItem(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "menu")] HttpRequestData req)
@@ -70,6 +73,7 @@ namespace CoffeeNChillFunctions
 
             try
             {
+                // AddEntityAsync adds the new menu item to the table (Microsoft, n.d.g).
                 await tableClient.AddEntityAsync(entity);
             }
             catch (RequestFailedException ex) when (ex.Status == 409)
@@ -94,6 +98,7 @@ namespace CoffeeNChillFunctions
             var tableClient = await GetTableClientAsync();
 
             var items = new List<MenuItemEntity>();
+            // QueryAsync reads every entity in the table (Microsoft, n.d.g).
             await foreach (var entity in tableClient.QueryAsync<MenuItemEntity>())
             {
                 items.Add(entity);
@@ -115,6 +120,7 @@ namespace CoffeeNChillFunctions
             var tableClient = await GetTableClientAsync();
 
             var items = new List<MenuItemEntity>();
+            // QueryAsync with a filter returns only the entities in one category (Microsoft, n.d.g).
             await foreach (var entity in tableClient.QueryAsync<MenuItemEntity>(e => e.PartitionKey == category))
             {
                 items.Add(entity);
@@ -138,6 +144,7 @@ namespace CoffeeNChillFunctions
             Response<MenuItemEntity> existingResponse;
             try
             {
+                // GetEntityAsync reads one entity by partition key and row key (Microsoft, n.d.g).
                 existingResponse = await tableClient.GetEntityAsync<MenuItemEntity>(category, id);
             }
             catch (RequestFailedException ex) when (ex.Status == 404)
@@ -168,6 +175,7 @@ namespace CoffeeNChillFunctions
             if (!string.IsNullOrWhiteSpace(updateDto.Name)) existing.Name = updateDto.Name!;
             if (!string.IsNullOrWhiteSpace(updateDto.Description)) existing.Description = updateDto.Description!;
 
+            // UpdateEntityAsync saves the changed entity (Microsoft, n.d.g).
             await tableClient.UpdateEntityAsync(existing, existing.ETag, TableUpdateMode.Replace);
 
             var response = req.CreateResponse(HttpStatusCode.OK);
@@ -187,6 +195,7 @@ namespace CoffeeNChillFunctions
 
             try
             {
+                // DeleteEntityAsync removes the entity (Microsoft, n.d.g).
                 await tableClient.DeleteEntityAsync(category, id);
             }
             catch (RequestFailedException ex) when (ex.Status == 404)

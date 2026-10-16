@@ -24,6 +24,7 @@ namespace CoffeeNChillFunctions
             _logger = logger;
         }
 
+        // HTTP trigger with an authorization level and route (Microsoft, n.d.a).
         [Function("UploadStaffDocument")]
         public async Task<HttpResponseData> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "documents/upload")] HttpRequestData req)
@@ -43,8 +44,10 @@ namespace CoffeeNChillFunctions
             }
 
             var containerClient = _blobServiceClient.GetBlobContainerClient(ContainerName);
+            // CreateIfNotExistsAsync creates the container on first use (Microsoft, n.d.c).
             await containerClient.CreateIfNotExistsAsync();
 
+            // MultipartReader reads the multipart body one section at a time (Microsoft, n.d.f).
             var reader = new MultipartReader(boundary, req.Body);
             string? uploadedFileName = null;
             long uploadedBytes = 0;
@@ -67,6 +70,7 @@ namespace CoffeeNChillFunctions
 
                 var blobClient = containerClient.GetBlobClient(fileName);
 
+                // UploadAsync writes the stream to the blob (Microsoft, n.d.b).
                 // Stream directly from the request body to the blob - no disk buffering.
                 await blobClient.UploadAsync(section.Body, overwrite: true);
 
@@ -96,6 +100,7 @@ namespace CoffeeNChillFunctions
 
         // Mirrors the disposition check Microsoft's own samples use, since
         // Microsoft.AspNetCore.WebUtilities doesn't ship one out of the box.
+        // Based on the streaming upload sample in Upload files in ASP.NET Core (Microsoft, n.d.h).
         private static bool IsFileSection(ContentDispositionHeaderValue? contentDisposition)
         {
             return contentDisposition is not null

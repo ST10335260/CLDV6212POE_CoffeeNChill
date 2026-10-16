@@ -21,15 +21,18 @@ namespace CoffeeNChillFunctions
             _logger = logger;
         }
 
+        // HTTP trigger with an authorization level and route (Microsoft, n.d.a).
         [Function("ListStaffDocuments")]
         public async Task<HttpResponseData> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "documents")] HttpRequestData req)
         {
             var containerClient = _blobServiceClient.GetBlobContainerClient(ContainerName);
+            // CreateIfNotExistsAsync creates the container on first use (Microsoft, n.d.c).
             await containerClient.CreateIfNotExistsAsync();
 
             var documents = new List<object>();
 
+            // GetBlobsAsync lists the blobs in the container (Microsoft, n.d.c).
             await foreach (var blobItem in containerClient.GetBlobsAsync())
             {
                 documents.Add(new
