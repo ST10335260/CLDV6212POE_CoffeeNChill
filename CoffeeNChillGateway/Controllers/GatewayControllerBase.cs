@@ -1,0 +1,49 @@
+using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
+
+namespace CoffeeNChillGateway.Controllers;
+
+/// <summary>
+/// Shared helpers for controllers that forward requests to the Azure Functions app.
+/// The [ApiController] attribute is explained in Microsoft (n.d.b); errors use ProblemDetails (Microsoft, n.d.d).
+/// </summary>
+[ApiController]
+public abstract class GatewayControllerBase : ControllerBase
+{
+    protected static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+
+    /// <summary>
+    /// Reads a Functions response, maps it to a gateway DTO and returns it with the same status code.
+    /// A failed Functions response is turned into a ProblemDetails error.
+    /// </summary>
+    protected async Task<IActionResult> Relay<TFrom, TTo>(HttpResponseMessage response, Func<TFrom, TTo> map)
+    {
+        string text = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return FunctionsError(response, text);
+        }
+
+        TFrom? data = JsonSerializer.Deserialize<TFrom>(text, JsonOptions);
+        if (data is null)
+        {
+            return StatusCode(StatusCodes.Status502BadGateway,
+                new ProblemDetails { Status = 502, Title = "The Functions backend returned an empty response." });
+        }
+
+        return StatusCode((int)response.StatusCode, map(data));
+    }
+
+    /// <summary>Builds a ProblemDetails error from a failed Functions response.</summary>
+    protected IActionResult FunctionsError(HttpResponseMessage response, string text)
+    {
+        string detail = string.IsNullOrWhiteSpace(text) ? response.ReasonPhrase ?? "Request failed." : text;
+        return StatusCode((int)response.StatusCode, new ProblemDetails
+        {
+            Status = (int)response.StatusCode,
+            Title = "The request could not be completed.",
+            Detail = detail
+        });
+    }
+}
