@@ -1,4 +1,6 @@
-# CoffeeNChill Part 2 - single-command stack (Azurite + Functions)
+# CoffeeNChill Part 3 - Azurite + Functions + API gateway
+# Start everything with: docker-compose up -d
+# Put JWT_KEY (at least 32 characters) in a .env file next to this file. See .env.example.
 
 services:
   azurite:
@@ -30,9 +32,23 @@ services:
     ports:
       - "7071:80"
     environment:
-   
       FUNCTIONS_WORKER_RUNTIME: dotnet-isolated
       AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+
+  gateway:
+    image: YOUR_DOCKERHUB_USERNAME/coffeenchill-gateway:v3.0   # replace with your Docker Hub username
+    container_name: coffeenchill-gateway
+    depends_on:
+      - functions
+    restart: on-failure
+    ports:
+      - "5000:8080"
+    environment:
+      Functions__BaseUrl: "http://functions/api/"
+      Storage__ConnectionString: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+      Jwt__Key: "${JWT_KEY}"
+      Jwt__Issuer: "CoffeeNChillGateway"
+      Jwt__Audience: "CoffeeNChillClients"
 
 volumes:
   azurite-data:
