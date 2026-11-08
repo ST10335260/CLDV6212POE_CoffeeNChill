@@ -7,6 +7,7 @@ using CoffeeNChillGateway.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using CoffeeNChillGateway.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,8 +51,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddAuthorization();
 
-// ---- Thato: register the auth services here (Users table client, password hasher, token service) ----
-
+// ---- Auth services ----
+builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+builder.Services.AddSingleton<IUserService, UserService>();
 
 // Controllers with the [ApiController] behaviour (Microsoft, n.d.b).
 builder.Services.AddControllers();
