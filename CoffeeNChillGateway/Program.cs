@@ -54,6 +54,7 @@ builder.Services.AddAuthorization();
 // ---- Auth services ----
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 builder.Services.AddSingleton<IUserService, UserService>();
+builder.Services.AddSingleton<ITokenService, TokenService>();
 
 // Controllers with the [ApiController] behaviour (Microsoft, n.d.b).
 builder.Services.AddControllers();

@@ -25,3 +25,29 @@ public class RegisterResponse
     public string Email { get; set; } = default!;
     public string Role { get; set; } = default!;
 }
+
+/// <summary>Request body for logging in.</summary>
+public class LoginRequest
+{
+    /// <summary>The email address used to register.</summary>
+    [Required, EmailAddress]
+    public string Email { get; set; } = default!;
+
+    /// <summary>The account password.</summary>
+    [Required]
+    public string Password { get; set; } = default!;
+}
+
+/// <summary>Returned after a successful login.</summary>
+public class LoginResponse
+{
+    /// <summary>The signed JWT. Send it as a Bearer token.</summary>
+    public string Token { get; set; } = default!;
+
+    /// <summary>When the token expires (UTC).</summary>
+    public DateTime ExpiresAt { get; set; }
+
+    public string Name { get; set; } = default!;
+    public string Email { get; set; } = default!;
+    public string Role { get; set; } = default!;
+}
