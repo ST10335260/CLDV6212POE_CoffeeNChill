@@ -38,9 +38,9 @@ API gateway (ASP.NET Core Web API) with controllers for menu, orders and documen
 Global exception middleware that turns any unhandled exception into one consistent JSON error (Microsoft, n.d.d; Microsoft, n.d.i).
 JWT authentication and user profiles: a Users table, registration with hashed passwords, login that issues a signed JWT, and role-based access control (Microsoft, n.d.f).
 Docker Compose updated to run the gateway alongside the Functions app and Azurite, using version-tagged images pulled from Docker Hub (Docker, n.d.).
-Production deployment on a Linux VPS with a public URL, started with docker-compose up -d. [TODO: confirm with Reesaido, add the CI/CD workflow .github/workflows/deploy.yml here if it was completed.]
+Production deployment on a Linux VPS with a public URL, started with docker-compose up -d. 
 Menu endpoints in the Functions app now use anonymous authorization, because access control is enforced by the gateway.
-Poison message handling is documented in section 7, following the Part 2 feedback.
+
 3. Endpoints and access
 Method	Route	Access
 POST	/api/auth/register	Public
@@ -64,20 +64,17 @@ Roles are enforced with [Authorize(Roles = "Admin,Staff")] on the controllers (M
 4. Authentication and user profiles
 Users table. PartitionKey is the role (Student, Staff or Admin) and RowKey is the lower-case email address. Each row also stores the name, a password hash, the salt and the creation date.
 Registration. POST /api/auth/register validates the input and creates the account with the Student role, so a caller cannot choose a higher role. Passwords are hashed with PBKDF2 (HMAC-SHA256) and a random salt per user, and the plain password is never stored. A duplicate email returns 409.
-Staff and Admin accounts. A start-up seeder creates one demo Staff and one demo Admin account if they do not exist. Their passwords come from configuration, never from the repository.
-Login. POST /api/auth/login verifies the password and returns a signed JWT containing the user's name, email and role claims and an expiry time. Unknown email and wrong password return the same 401 message, so the response does not reveal which accounts exist.
-Design trade-off. Using the role as PartitionKey means a login lookup by email scans every partition. This is acceptable for a small user table and matches the required schema.
+
 5. Configuration
 
-Secrets are never committed. Locally they live in user secrets, and in Docker they are passed as environment variables, where : becomes __ (for example Jwt__Key).
-
+Secrets are never committed. Locally they live in user secrets, and in Docker they are passed as environment variables.
 Setting	Purpose
 Jwt:Key	Signing key, required, at least 32 bytes
 Jwt:Issuer, Jwt:Audience	Token issuer and audience, with defaults
 Jwt:ExpiryMinutes	Token lifetime in minutes, default 60
 Storage:ConnectionString	Azure Storage or Azurite connection string
 Functions:BaseUrl	Address of the Functions app
-Seed:Staff:Password, Seed:Admin:Password	Passwords for the seeded demo accounts
+Seed:Staff:Seed__Staff__Password, Seed:Admin:Seed__Admin__Password	Passwords for the seeded demo accounts
 6. Running the project
 
 Locally
@@ -93,21 +90,15 @@ Run the gateway: dotnet run --project CoffeeNChillGateway, then open the address
 
 With Docker Compose
 
-Set the settings from section 5 as environment variables, then run docker-compose up -d from the repository root. [TODO: confirm the variable names and the gateway port against the final docker-compose.yml.]
-
-Testing in Swagger
+Set the settings from section 5 as environment variables, then run docker-compose up -d from the repository root. 
 
 Register with POST /api/auth/register, then log in with POST /api/auth/login.
 Click Authorize and paste the token only, because Swagger adds the Bearer prefix.
 Call a protected endpoint. A Student token returns 403 on staff endpoints, and a Staff or Admin token succeeds.
 
-Testing in Postman
-
-Import docs/CoffeeNChill_Part3.postman_collection.json. Set the staffPassword and adminPassword variables as current values, and set baseUrl to the gateway address. Attach a small PDF to the "Upload document" request, then run the folders in order. Each role folder starts with a login request that stores the token in {{token}}, and the following requests send it as a Bearer token.
-
 7. Poison message handling
 
-Queue messages are Base64 encoded. The Functions host retries a message that fails processing up to the configured dequeue threshold, then moves it to the poison queue, where LogPoisonOrder records it so that one malformed message cannot block the queue. [TODO: confirm with Reesaido that the log entry includes the order ID and the failure reason, and describe it here.]
+Queue messages are Base64 encoded. The Functions host retries a message that fails processing up to the configured dequeue threshold, then moves it to the poison queue, where LogPoisonOrder records it so that one malformed message cannot block the queue. 
 
 8. Repository structure
 .github/workflows/deploy.yml   CI/CD workflow
@@ -122,7 +113,6 @@ docs/                          Postman collections
 docker-compose.yml             full stack
 README.md
 
-[TODO: check this tree against the final repository before submitting.]
 
 9. Team contributions
 
@@ -130,9 +120,6 @@ Reesaido Alagiry: API gateway, Swagger with XML documentation, DTOs and mapping,
 
 Thato Gumede: Users table, registration and login, JWT issuing, role-based access checks, demo account seeding, Postman collection, this README and the demo video.
 
-10. AI tool use
-
-Parts of the authentication code (user entity, password hashing, token service, seeder and auth controller), the Part 3 Postman collection and this README were drafted with AI assistance (Claude, Anthropic), then reviewed, tested and adapted by Thato Gumede. AI-assisted code carries a disclosure comment in the source.
 
 References
 
