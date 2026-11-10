@@ -2,6 +2,7 @@ using Azure.Storage.Blobs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+// Host set up for the isolated worker model (Microsoft, n.d.d).
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
     .ConfigureServices(services =>
@@ -12,6 +13,7 @@ var host = new HostBuilder()
         // Functions container (see README).
         services.AddSingleton(_ =>
         {
+            // Falls back to the local Azurite storage emulator when no connection string is set (Microsoft, n.d.i).
             string connectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage")
                 ?? "UseDevelopmentStorage=true";
 

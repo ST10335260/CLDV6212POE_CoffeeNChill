@@ -21,6 +21,7 @@ namespace CoffeeNChillFunctions
             _logger = logger;
         }
 
+        // HTTP trigger with an authorization level and route (Microsoft, n.d.a).
         [Function("DownloadStaffDocument")]
         public async Task<HttpResponseData> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "documents/download/{fileName}")] HttpRequestData req,
@@ -29,6 +30,7 @@ namespace CoffeeNChillFunctions
             var containerClient = _blobServiceClient.GetBlobContainerClient(ContainerName);
             var blobClient = containerClient.GetBlobClient(fileName);
 
+            // ExistsAsync checks that the blob is there before downloading (Microsoft, n.d.b).
             if (!await blobClient.ExistsAsync())
             {
                 var notFound = req.CreateResponse(HttpStatusCode.NotFound);
@@ -36,6 +38,7 @@ namespace CoffeeNChillFunctions
                 return notFound;
             }
 
+            // DownloadStreamingAsync returns the blob content as a stream (Microsoft, n.d.b).
             var download = await blobClient.DownloadStreamingAsync();
 
             var response = req.CreateResponse(HttpStatusCode.OK);
