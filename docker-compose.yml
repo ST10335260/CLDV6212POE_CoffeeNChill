@@ -36,7 +36,7 @@ services:
       AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
 
   gateway:
-    image: YOUR_DOCKERHUB_USERNAME/coffeenchill-gateway:v3.0   # replace with your Docker Hub username
+    image: st10335260/coffeenchill-gateway:v3.0   # replace with your Docker Hub username
     container_name: coffeenchill-gateway
     depends_on:
       - functions
@@ -47,6 +47,8 @@ services:
       Functions__BaseUrl: "http://functions/api/"
       Storage__ConnectionString: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
       Jwt__Key: "${JWT_KEY}"
+      Seed__Staff__Password: "${SEED_STAFF_PASSWORD}"
+      Seed__Admin__Password: "${SEED_ADMIN_PASSWORD}"
       Jwt__Issuer: "CoffeeNChillGateway"
       Jwt__Audience: "CoffeeNChillClients"
 
