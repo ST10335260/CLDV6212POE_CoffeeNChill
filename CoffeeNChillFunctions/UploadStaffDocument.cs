@@ -72,7 +72,11 @@ namespace CoffeeNChillFunctions
 
                 // UploadAsync writes the stream to the blob (Microsoft, n.d.b).
                 // Stream directly from the request body to the blob - no disk buffering.
-                await blobClient.UploadAsync(section.Body, overwrite: true);
+                using var buffer = new MemoryStream();
+                await section.Body.CopyToAsync(buffer);
+                buffer.Position = 0;
+
+                await blobClient.UploadAsync(buffer, overwrite: true);
 
                 var properties = await blobClient.GetPropertiesAsync();
                 uploadedFileName = fileName;

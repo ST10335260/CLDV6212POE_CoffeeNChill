@@ -11,10 +11,12 @@
 	<ItemGroup>
 		<!-- Table Storage (Menu functions) -->
 		<PackageReference Include="Azure.Data.Tables" Version="12.9.1" />
+		<PackageReference Include="Azure.Storage.Queues" Version="12.28.1" />
 
 		<!-- Isolated worker + classic HttpRequestData/HttpResponseData HTTP model -->
 		<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.52.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.2.0" />
+		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Storage.Queues" Version="5.5.5" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.1.0" OutputItemType="Analyzer" />
 
 		<!-- Blob Storage (staff-document functions) -->

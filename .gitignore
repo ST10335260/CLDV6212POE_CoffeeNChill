@@ -1,0 +1,7 @@
+.vs/
+bin/
+obj/
+.DS_Store
+
+.env
+local.settings.json
