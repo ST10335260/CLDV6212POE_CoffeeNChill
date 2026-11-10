@@ -12,11 +12,7 @@ Group	CLDV6212 Group 13: Reesaido Alagiry (ST10335260), Thato Gumede (ST10275159
 
 1. Architecture
 
-
-
-
-
-
+<img width="961" height="452" alt="CLDV6212 Diagram" src="https://github.com/user-attachments/assets/b1938dbf-c0f2-473c-8c38-0d739b5b4642" />
 
 
 
