@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,20 @@ namespace CoffeeNChillGateway.Controllers;
 public abstract class GatewayControllerBase : ControllerBase
 {
     protected static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+
+    /// <summary>
+    /// Builds a JSON request body with a known length. The Functions host has chunked request binding turned off,
+    /// so a body sent with chunked transfer encoding (the default for PostAsJsonAsync) arrives empty.
+    /// </summary>
+    protected static StringContent JsonBody(object value) =>
+        new(JsonSerializer.Serialize(value, JsonOptions), Encoding.UTF8, "application/json");
+
+    /// <summary>Buffers a request body so it is sent with a Content-Length instead of chunked.</summary>
+    protected static async Task<HttpContent> Buffered(HttpContent content)
+    {
+        await content.LoadIntoBufferAsync();
+        return content;
+    }
 
     /// <summary>
     /// Reads a Functions response, maps it to a gateway DTO and returns it with the same status code.

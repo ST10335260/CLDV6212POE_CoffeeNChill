@@ -31,7 +31,7 @@ public class OrdersController : GatewayControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PlaceOrder([FromBody] PlaceOrderRequest request)
     {
-        var response = await Functions.PostAsJsonAsync("orders/queue", request);
+        var response = await Functions.PostAsync("orders/queue", JsonBody(request));
         return await Relay<PlaceOrderResponse, PlaceOrderResponse>(response, r => r);
     }
 

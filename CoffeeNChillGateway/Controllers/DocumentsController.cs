@@ -43,7 +43,7 @@ public class DocumentsController : GatewayControllerBase
         await using var stream = file.OpenReadStream();
         content.Add(new StreamContent(stream), "file", file.FileName);
 
-        var response = await Functions.PostAsync("documents/upload", content);
+        var response = await Functions.PostAsync("documents/upload", await Buffered(content));
         return await Relay<UploadDocumentResponse, UploadDocumentResponse>(response, r => r);
     }
 

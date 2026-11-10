@@ -36,7 +36,7 @@ services:
       AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
 
   gateway:
-    image: st10335260/coffeenchill-gateway:v3.0   # replace with your Docker Hub username
+    image: st10335260/coffeenchill-gateway:v3.0  
     container_name: coffeenchill-gateway
     depends_on:
       - functions

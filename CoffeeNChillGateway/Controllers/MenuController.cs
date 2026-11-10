@@ -49,7 +49,7 @@ public class MenuController : GatewayControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Create([FromBody] CreateMenuItemRequest request)
     {
-        var response = await Functions.PostAsJsonAsync("menu", MenuMapper.ToFunctionCreate(request));
+        var response = await Functions.PostAsync("menu", JsonBody(MenuMapper.ToFunctionCreate(request)));
         return await Relay<FunctionMenuItem, MenuItemResponse>(response, MenuMapper.ToResponse);
     }
 
@@ -62,8 +62,8 @@ public class MenuController : GatewayControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Update(string category, string id, [FromBody] UpdateMenuItemRequest request)
     {
-        var response = await Functions.PutAsJsonAsync(
-            $"menu/{Uri.EscapeDataString(category)}/{Uri.EscapeDataString(id)}", request);
+        var response = await Functions.PutAsync(
+            $"menu/{Uri.EscapeDataString(category)}/{Uri.EscapeDataString(id)}", JsonBody(request));
         return await Relay<FunctionMenuItem, MenuItemResponse>(response, MenuMapper.ToResponse);
     }
 
